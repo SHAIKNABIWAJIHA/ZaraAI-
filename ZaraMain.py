@@ -26,6 +26,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.uic import loadUiType
 from ZaraUi import Ui_ZaraUi
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtCore import QThread
 
 engine=pyttsx3.init('sapi5')
 voices=engine.getProperty("voices")
@@ -98,39 +101,58 @@ def pdf_reader():
       print(text)
       speak(text)
 
+class MainThread(QThread):
+     def __init__(self):
+          super(MainThread,self).__init__()
+     def run(self):
+          self.TaskExecution()
+     
+     def takeCommand(self):
+          r=sr.Recognizer()
+          with sr.Microphone() as source:
+               print("listening...")
+               r.pause_threshold=1
+               audio=r.listen(source,timeout=1,phrase_time_limit=5)
+          try:
+               print("Recognizing...")
+               query=r.recognize_google(audio,language="en-in")
+               print(f"user said:{query}")
+          except Exception as e:
+                    speak("say that again please...") 
+                    return "none"
+          return query
     
-
-if __name__=="__main__": 
-    wishMe() 
-    while True:
+     def TaskExecution(self):
+      wishMe() 
+      while True:
          
-         query=takeCommand().lower()  
+         self.query=takeCommand().lower()  
          
-         if "open notepad" in query:
+         if "open notepad" in self.query:
               op()
               npath="C:\\Windows\\notepad.exe"
               os.startfile(npath)
          
-         elif "close notepad" in query:
+         elif "close notepad" in  self.query:
               close("notepad.exe")
 
-         elif "open command prompt" in query:
+         elif "open command prompt" in  self.query:
               op()
               os.system("start cmd")
           
-         elif "close command prompt" in query:
+         elif "close command prompt" in self.query:
               close("cmd.exe")
 
-         elif "open camera" in query:
+         elif "open camera" in  self.query:
               op()
               os.system("start microsoft.windows.camera:")
               speak("Camera opened successfully!")
          
-         elif "close camera" in query:
+         elif "close camera" in  self.query:
               os.system("taskkill /f /im WindowsCamera.exe")
               speak("Camera closed successfully!")
          
-         elif "play music" in query: 
+         elif "play music" in  self.query: 
               music_dir="C:\\Users\\wajih\\Desktop\\music_dir" 
               songs=os.listdir(music_dir)
               rd=random.choice(songs)
@@ -138,12 +160,12 @@ if __name__=="__main__":
                    if song.endswith('.mp3'):
                      os.startfile(os.path.join(music_dir,song))
          
-         elif "ip address" in query:
+         elif "ip address" in  self.query:
               ip=get('https://api.ipify.org').text
               print(ip)
               speak(f"your ip address is {ip}")
 
-         elif "wikipedia" in query:
+         elif "wikipedia" in self.query:
               speak("searching in wikipedia...")
               query=query.replace("wikipedia","")
               results=wikipedia.summary(query,sentences=1)
@@ -151,28 +173,28 @@ if __name__=="__main__":
               print(results)
               speak(results)
 
-         elif "open youtube" in query:
+         elif "open youtube" in  self.query:
               op()
               webbrowser.open("www.youtube.com")
 
-         elif "open stack overflow" in query:
+         elif "open stack overflow" in  self.query:
               op()
               webbrowser.open("www.stackoverflow.com")
 
-         elif "open google" in query:
+         elif "open google" in  self.query:
               op()
               speak("what should i search on google?")
               cm=takeCommand().lower()
               webbrowser.open(f"{cm}")
 
-         elif "send message" in query:
+         elif "send message" in  self.query:
               kit.sendwhatmsg("+918978935262","ok",20,52)
               speak("msg sent successfully")
 
-         elif "play song on youtube" in query:
+         elif "play song on youtube" in  self.query:
               kit.playonyt("see you again")
 
-         elif "set alarm" in query:
+         elif "set alarm" in  self.query:
              tt=int(datetime.datetime.now().hour)
              if tt==19:
                  speak(f"speak wake up the time is {tt}")
@@ -180,34 +202,34 @@ if __name__=="__main__":
                  songs=os.listdir(music_dir)
                  os.startfile(os.path.join(music_dir,songs[0]))
          
-         elif "tell me a joke" in query:
+         elif "tell me a joke" in  self.query:
              joke=pyjokes.get_joke()
              print(f'joke:{joke}')
              speak(joke)
 
-         elif "shut down the system" in query:
+         elif "shut down the system" in  self.query:
              os.system("shutdown /s /t 5")
 
-         elif "restart the system" in query:
+         elif "restart the system" in  self.query:
              os.system("shutdown /r /t 5")
              
-         elif "sleep the system" in query:
+         elif "sleep the system" in  self.query:
             ctypes.windll.PowrProf.SetSuspendState(0, 1, 0)
           
-         elif "switch the window" in query:
+         elif "switch the window" in  self.query:
              pyautogui.keyDown("alt")
              pyautogui.press("tab")
              time.sleep(3)
              pyautogui.keyUp("alt")
          
-         elif "love you" in query:
+         elif "love you" in  self.query:
              speak("sorry mam i am unable to recieve your love")
              speak("As per my knowledge you have a boyfriend named jaan please express your love to him")
          
-         elif "where am i" in query or "where we are" in query or "find location" in query:
+         elif "where am i" in  self.query or "where we are" in  self.query or "find location" in  self.query:
               location()
          
-         elif "insta profile" in query or "download insta profile" in query:
+         elif "insta profile" in  self.query or "download insta profile" in  self.query:
               speak("sir please enter the username correctly")
               name=input("enter username here: ")
               webbrowser.open(f"www.instagram.com/{name}")
@@ -222,42 +244,76 @@ if __name__=="__main__":
               else:
                    pass
          
-         elif "take screenshot" in query:
+         elif "take screenshot" in  self.query:
                 mysc=pyautogui.screenshot()
                 mysc.save(r'D:\\screenshot.png')
                 speak("screenshot taken and saved in d drive")
 
-         elif "open c drive" in query:
+         elif "open c drive" in  self.query:
               op()
               os.startfile("C:\\")
           
-         elif "open d drive" in query:
+         elif "open d drive" in  self.query:
               op()
               os.startfile("D:\\")
 
-         elif "open e drive" in query:
+         elif "open e drive" in  self.query:
               op()
               os.startfile("E:\\")
 
-         elif "open f drive" in query:
+         elif "open f drive" in  self.query:
               op()
               os.startfile("E:\\")
          
-         elif "are you there" in query:
+         elif "are you there" in  self.query:
               speak("yes mam....")
          
-         elif "thank you" in query:
+         elif "thank you" in  self.query:
               speak("it's my pleasure mam")
 
-         elif "close" in query:
+         elif "close" in  self.query:
               speak("do you have any otherworks mam")
               
-         elif "no thanks" in query:
+         elif "no thanks" in  self.query:
           speak(" ok i am quitting mam,have a good day!")
           break
           
-         elif "read pdf" in query:
+         elif "read pdf" in  self.query:
               pdf_reader()
+startExecution=MainThread()
+class Main(QMainWindow):
+     def __init__(self):
+          super().__init__()
+          self.ui=Ui_ZaraUi()
+          self.ui.setupUi(self)
+          self.ui.pushButton.clicked.connect(self.startTask)
+          self.ui.pushButton_2.clicked.connect(self.close)
+     
+     def startTask(self):
+          self.ui.movie=QtGui.QMovie("../../Downloads/background_img.jpg")
+          self.ui.label.setMovie(self.ui.movie)
+          self.ui.movie.start()
+          self.ui.movie=QtGui.QMovie("../../Downloads/top_loading.gif")
+          self.ui.label_2.setMovie(self.ui.movie)
+          self.ui.movie.start()
+          timer=QTimer(self)
+          timer.timeout.connect(self.showTime)
+          timer.start(1000)
+          startExecution.start()
+
+     def showTime(self):
+       current_time=QTime.currentTime()
+       current_date=QDate.currentDate()
+       label_time=current_time.toString("hh:mm:ss")
+       label_date=current_date.toString(Qt.ISODate)
+       self.ui.textBrowser.setText(label_date)
+       self.ui.textBrowser_2.setText(label_time)
+
+    
+app=QApplication(sys.argv) # type: ignore
+Zaara=Main()
+Zaara.show()
+exit(app.exec_())
 
            
                 
