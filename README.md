@@ -1,0 +1,2 @@
+This is a voice assistant written in python with live gui.. This takes commands through voice and executs them and replies you back.. This is not completely an AI but it is an AI model which takes bundle of statemens as input and gives output as required.
+One of the best feature it has is that it consists of live gui..Time updates dynamically and the design is designed with QTDesigner which makes it look pretty cool.
