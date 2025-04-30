@@ -39,20 +39,20 @@ def speak(audio):
     engine.say(audio)
     engine.runAndWait()
 
-def takeCommand():
-    r=sr.Recognizer()
-    with sr.Microphone() as source:
-        print("listening...")
-        r.pause_threshold=1
-        audio=r.listen(source,timeout=1,phrase_time_limit=5)
-    try:
-        print("Recognizing...")
-        query=r.recognize_google(audio,language="en-in")
-        print(f"user said:{query}")
-    except Exception as e:
-           speak("say that again please...") 
-           return "none"
-    return query
+# def takeCommand():
+#     r=sr.Recognizer()
+#     with sr.Microphone() as source:
+#         print("listening...")
+#         r.pause_threshold=1
+#         audio=r.listen(source,timeout=1,phrase_time_limit=5)
+#     try:
+#         print("Recognizing...")
+#         query=r.recognize_google(audio,language="en-in")
+#         print(f"user said:{query}")
+#     except Exception as e:
+#            speak("say that again please...") 
+#            return "none"
+#     return query
 
 def wishMe():
      hour = int(datetime.datetime.now().hour)
@@ -112,7 +112,7 @@ class MainThread(QThread):
           with sr.Microphone() as source:
                print("listening...")
                r.pause_threshold=1
-               audio=r.listen(source,timeout=1,phrase_time_limit=5)
+               audio=r.listen(source,timeout=3,phrase_time_limit=5)
           try:
                print("Recognizing...")
                query=r.recognize_google(audio,language="en-in")
@@ -126,9 +126,20 @@ class MainThread(QThread):
       wishMe() 
       while True:
          
-         self.query=takeCommand().lower()  
+         self.query=self.takeCommand().lower()
+
+         if "hello" in self.query:
+              speak("hello mam")  
+          
+         elif "how are you" in self.query:
+              speak("i am good mam ,thank you for asking ,what about you")
+          
+         elif "i am doing great" in self.query:
+              speak("that's great to hear")
+              speak("please tell me how may i help you")
+              
          
-         if "open notepad" in self.query:
+         elif "open notepad" in self.query:
               op()
               npath="C:\\Windows\\notepad.exe"
               os.startfile(npath)
@@ -184,11 +195,12 @@ class MainThread(QThread):
          elif "open google" in  self.query:
               op()
               speak("what should i search on google?")
-              cm=takeCommand().lower()
+              cm=self.takeCommand().lower()
               webbrowser.open(f"{cm}")
 
          elif "send message" in  self.query:
-              kit.sendwhatmsg("+918978935262","ok",20,52)
+              speak("sending mam,please gimme a second")
+              kit.sendwhatmsg("+918978935262","ok",11,13)
               speak("msg sent successfully")
 
          elif "play song on youtube" in  self.query:
@@ -236,7 +248,7 @@ class MainThread(QThread):
               speak(f"mam here is the profile of the user {name}")
               time.sleep(5)
               speak("sir would you like to download profile picture")
-              condition=takeCommand().lower()
+              condition=self.takeCommand().lower()
               if "yes" in condition or "proceed" in condition:
                    mod=instaloader.Instaloader()
                    mod.download_profile(name,profile_pic_only=True)
@@ -280,6 +292,19 @@ class MainThread(QThread):
           
          elif "read pdf" in  self.query:
               pdf_reader()
+        
+         elif 'timer' in self.query or 'stopwatch' in self.query:
+                speak("For how many minutes?")
+                timing = self.takecommand()
+                timing =timing.replace('minutes', '')
+                timing = timing.replace('minute', '')
+                timing = timing.replace('for', '')
+                timing = float(timing)
+                timing = timing * 60
+                speak(f'I will remind you in {timing} seconds')
+                time.sleep(timing)
+                speak('Your time has been finished sir') 
+
 startExecution=MainThread()
 class Main(QMainWindow):
      def __init__(self):
