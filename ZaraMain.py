@@ -37,11 +37,9 @@ def speak(audio):
     print(audio)
     engine.runAndWait()
 
-
 def wish():
     hour = int(datetime.datetime.now().hour)
     tt = time.strftime("%I:%M %p")
-
     if hour >= 0 and hour <= 12:
         speak(f"good morning, its {tt}")
     elif hour >= 12 and hour <= 18:
@@ -70,6 +68,7 @@ class MainThread(QThread):
     
     def run(self):
         self.TaskExecution()
+    
     def takeCommand(self):
         r=sr.Recognizer()
         with sr.Microphone() as source:
@@ -84,6 +83,7 @@ class MainThread(QThread):
             speak("say that again please...") 
             return "none"
         return query
+    
     def TaskExecution(self):
 
         def typeandsave():
@@ -135,10 +135,6 @@ class MainThread(QThread):
 
             elif self.query in ['i am good','i am going great','fine']:
                 speak("tell me mam how may i help you today.")
-
-            elif "love you" in  self.query:
-               speak("sorry mam i am unable to recieve your love")
-               speak("As per my knowledge you have a boyfriend named jaan please express your love to him")
             
             elif "play music" in self.query:
                 music_dir = "C:\\Users\\Public\\Music"
@@ -172,10 +168,10 @@ class MainThread(QThread):
             elif "open google" in self.query:
                 speak("opening..")
                 time.sleep(3)
-                speak("sir, what should i search on google")
+                speak("mam, what should i search on google")
                 cm = self.takeCommand().lower()
                 webbrowser.open(f"{cm}")
-                speak("here is what i found sir..")
+                speak("here is what i found mam..")
              
             elif "open camera" in  self.query:
                 speak("opening...")
@@ -218,11 +214,11 @@ class MainThread(QThread):
                     temp=data.find("div",class_="BNeawe").text
                     speak(f"current {search} is {temp}")
                     if temp < '20°':
-                        speak("It will be better if you wear woolen clothes, sir.")
+                        speak("It will be better if you wear woolen clothes, mam.")
                     elif temp <= '14°':
-                        speak("Sir, it is very cold outside. If you want to go outside, wear woolen clothes.")
+                        speak("mam, it is very cold outside. If you want to go outside, wear woolen clothes.")
                     elif temp >= '25°':
-                        speak("Sir, you can wear cotton clothes as it is somewhat hot today..")
+                        speak("mam, you can wear cotton clothes as it is somewhat hot today..")
 
             elif "where am i" in self.query or "find my location" in self.query or "where are we" in self.query:
                 speak("wait maam.., let me check")
@@ -247,7 +243,7 @@ class MainThread(QThread):
             elif "shutdown" in self.query:
                 while True:
                     speak("are you sure to shutdown the system")
-                    ye=self.takecommand()
+                    ye=self.takeCommand()
                     if "yes" in ye:
                         speak('shutting down the system')
                         os.system('shutdown /s /t 5')
@@ -261,7 +257,7 @@ class MainThread(QThread):
             elif "restart" in self.query:
                 while True:
                     speak("are you sure to restart the system")
-                    ye=self.takecommand()
+                    ye=self.takeCommand()
                     if "yes" in ye:
                         speak('restarting the system')
                         os.system('shutdown /r /t 5')
