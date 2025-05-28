@@ -105,7 +105,7 @@ class MainThread(QThread):
                     type()
                     break
 
-        def typeandsave():            
+        def type():            
             speak('tell me what to type')
             while True: 
                 ty=self.takeCommand()
@@ -194,19 +194,7 @@ class MainThread(QThread):
                     kit.playonyt(cm)
                 else:
                     speak('say that again please')
-                    self.takecommand().lower()
-                
-            # elif 'timer' in self.query or 'stopwatch' in self.query:
-            #     speak("For how many minutes?")
-            #     timing = self.takeCommand()
-            #     timing =timing.replace('minutes', '')
-            #     timing = timing.replace('minute', '')
-            #     timing = timing.replace('for', '')
-            #     timing = float(timing)
-            #     timing = timing * 60
-            #     speak(f'I will remind you in {timing} seconds')
-            #     time.sleep(timing)
-            #     speak('Your time has been finished mam')                        
+                    self.takecommand().lower()                      
 
             elif "tell me a joke" in self.query:
                 joke = pyjokes.get_joke()
